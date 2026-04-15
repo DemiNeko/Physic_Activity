@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Дене тәрбиесі — 10 күндік бағдарлама</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08090e;
+  --s1:#0f1118;
+  --s2:#161922;
+  --s3:#1d2130;
+  --border:rgba(255,255,255,0.07);
+  --bh:rgba(255,255,255,0.13);
+  --accent:#e8f53a;
+  --green:#4af0a8;
+  --orange:#f5853a;
+  --red:#f03a6e;
+  --blue:#38bdf8;
+  --purple:#a78bfa;
+  --text:#eef0f7;
+  --muted:#7a8099;
+  --dim:#3a3f58;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ─── NOISE OVERLAY ─── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.6}
+
+/* ─── HERO ─── */
+.hero{position:relative;padding:80px 24px 60px;text-align:center;overflow:hidden;z-index:1}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(232,245,58,.12) 0%,transparent 65%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:1px;height:60px;background:linear-gradient(to bottom,var(--accent),transparent)}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(232,245,58,.07);border:1px solid rgba(232,245,58,.22);border-radius:100px;padding:5px 15px 5px 10px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:28px}
+.hero-eyebrow svg{width:13px;height:13px;stroke:var(--accent);fill:none}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,11vw,112px);line-height:.9;letter-spacing:.01em;margin-bottom:20px}
+.hero h1 em{color:var(--accent);font-style:normal;display:block}
+.hero-sub{font-size:15px;color:var(--muted);max-width:420px;margin:0 auto 52px;line-height:1.7}
+.stats-row{display:flex;justify-content:center;gap:0;flex-wrap:wrap;border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:480px;margin:0 auto;background:var(--s1)}
+.stat-item{flex:1;min-width:120px;padding:18px 0;text-align:center;position:relative}
+.stat-item+.stat-item::before{content:'';position:absolute;left:0;top:20%;height:60%;width:1px;background:var(--border)}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:var(--text)}
+.stat-label{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+
+/* ─── MODE BANNER ─── */
+.top-bar{max-width:1100px;margin:0 auto;padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.mode-chip{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:5px 12px;border-radius:100px}
+.mode-chip.seq{background:rgba(74,240,168,.07);border:1px solid rgba(74,240,168,.2);color:var(--green)}
+.mode-chip.free{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);color:var(--blue)}
+.mode-chip svg{width:11px;height:11px;stroke:currentColor;fill:none}
+.prog-pct-inline{font-size:12px;font-weight:700;color:var(--accent)}
+
+/* ─── PROGRESS ─── */
+.prog-section{max-width:1100px;margin:12px auto 0;padding:0 24px;position:relative;z-index:1}
+.prog-bar{height:3px;background:var(--s3);border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:100px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* ─── GRID ─── */
+.days-grid{max-width:1100px;margin:0 auto;padding:20px 24px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;position:relative;z-index:1}
+
+/* ─── CARD ─── */
+.day-card{background:var(--s1);border:1px solid var(--border);border-radius:18px;transition:border-color .2s,transform .2s,opacity .2s;cursor:pointer;position:relative;overflow:hidden;animation:fadeUp .5s ease both}
+.day-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 0% 0%,rgba(232,245,58,.04) 0%,transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.day-card:hover:not(.locked)::before{opacity:1}
+.day-card:hover:not(.locked){border-color:var(--bh);transform:translateY(-2px)}
+.day-card.done{border-color:rgba(74,240,168,.18)}
+.day-card.locked{opacity:.45;cursor:not-allowed}
+.card-inner{padding:20px 20px 18px;display:flex;align-items:flex-start;gap:14px;user-select:none}
+.day-num{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:1;color:var(--dim);min-width:48px;transition:color .2s}
+.day-card:hover:not(.locked) .day-num{color:var(--accent)}
+.day-card.done .day-num{color:var(--green)}
+.card-meta{flex:1;min-width:0}
+.card-title{font-size:14px;font-weight:700;line-height:1.35;margin-bottom:8px;color:var(--text)}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.tag{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px;border:1px solid}
+.tag-warm{color:var(--orange);border-color:rgba(245,133,58,.3);background:rgba(245,133,58,.07)}
+.tag-cardio{color:var(--red);border-color:rgba(240,58,110,.3);background:rgba(240,58,110,.07)}
+.tag-strength{color:var(--green);border-color:rgba(74,240,168,.3);background:rgba(74,240,168,.07)}
+.tag-flex{color:var(--purple);border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.07)}
+.tag-rest{color:var(--accent);border-color:rgba(232,245,58,.3);background:rgba(232,245,58,.07)}
+.tag-balance{color:var(--blue);border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.07)}
+.tag-core{color:#fb923c;border-color:rgba(251,146,60,.3);background:rgba(251,146,60,.07)}
+.card-ex-count{font-size:11px;color:var(--dim)}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.dur-badge{font-size:11px;font-weight:700;color:var(--muted);background:var(--s2);border-radius:100px;padding:3px 10px;white-space:nowrap}
+.done-badge{width:20px;height:20px;display:none;align-items:center;justify-content:center;background:rgba(74,240,168,.1);border-radius:50%;border:1.5px solid rgba(74,240,168,.35)}
+.done-badge svg{width:10px;height:10px;stroke:var(--green);fill:none}
+.day-card.done .done-badge{display:flex}
+.lock-badge{width:20px;height:20px;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.03);border-radius:50%;border:1px solid var(--border)}
+.lock-badge svg{width:10px;height:10px;stroke:var(--muted);fill:none}
+.day-card.locked .lock-badge{display:flex}
+.arrow-btn{width:26px;height:26px;background:var(--s2);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.arrow-btn svg{width:12px;height:12px;stroke:var(--dim);fill:none;transition:stroke .2s}
+.day-card:hover:not(.locked) .arrow-btn svg{stroke:var(--accent)}
+/* card bottom accent line for done */
+.day-card.done::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+
+/* ─── MODALS ─── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.open{opacity:1;pointer-events:all}
+
+/* ─── DAY MODAL ─── */
+.day-modal{background:var(--s1);border:1px solid var(--border);border-radius:22px;width:100%;max-width:580px;max-height:87vh;overflow-y:auto;transform:translateY(24px) scale(.98);transition:transform .35s cubic-bezier(.34,1.56,.64,1);scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+.day-modal::-webkit-scrollbar{width:3px}
+.day-modal::-webkit-scrollbar-thumb{background:var(--dim);border-radius:3px}
+.overlay.open .day-modal{transform:none}
+.dm-header{padding:22px 22px 0;display:flex;align-items:flex-start;gap:14px}
+.dm-num{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;color:var(--accent);min-width:56px}
+.dm-info{flex:1;min-width:0;padding-top:4px}
+.dm-title{font-size:17px;font-weight:800;line-height:1.3;margin-bottom:8px}
+.dm-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dm-dur{font-size:11px;font-weight:700;color:var(--muted);background:var(--s2);border-radius:100px;padding:3px 10px}
+.close-btn{width:30px;height:30px;min-width:30px;border-radius:50%;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.close-btn:hover{background:var(--s3)}
+.close-btn svg{width:13px;height:13px;stroke:var(--muted);fill:none}
+.dm-body{padding:18px 22px 22px}
+.dm-note{background:rgba(232,245,58,.04);border:1px solid rgba(232,245,58,.13);border-radius:11px;padding:11px 14px;font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:16px;display:flex;gap:9px;align-items:flex-start}
+.dm-note svg{width:14px;height:14px;stroke:var(--accent);fill:none;flex-shrink:0;margin-top:2px}
+.ex-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.ex-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--s2);border-radius:12px;border:1px solid var(--border);transition:border-color .15s}
+.ex-item:hover{border-color:var(--bh)}
+.ex-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ex-ico svg{width:18px;height:18px;fill:none}
+.ico-y{background:rgba(232,245,58,.09)} .ico-y svg{stroke:var(--accent)}
+.ico-g{background:rgba(74,240,168,.09)} .ico-g svg{stroke:var(--green)}
+.ico-o{background:rgba(245,133,58,.09)} .ico-o svg{stroke:var(--orange)}
+.ico-p{background:rgba(240,58,110,.09)} .ico-p svg{stroke:var(--red)}
+.ico-v{background:rgba(167,139,250,.09)} .ico-v svg{stroke:var(--purple)}
+.ico-b{background:rgba(56,189,248,.09)} .ico-b svg{stroke:var(--blue)}
+.ex-cnt{flex:1;min-width:0}
+.ex-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.ex-desc{font-size:11.5px;color:var(--muted);line-height:1.5}
+.ex-params{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.ex-p{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--border)}
+.done-btn{width:100%;height:44px;border-radius:12px;border:1.5px solid rgba(232,245,58,.28);background:rgba(232,245,58,.05);color:var(--accent);font-family:'Manrope',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,border-color .2s}
+.done-btn:hover{background:rgba(232,245,58,.1);border-color:rgba(232,245,58,.45)}
+.done-btn.is-done{background:rgba(74,240,168,.07);border-color:rgba(74,240,168,.28);color:var(--green)}
+.done-btn svg{width:15px;height:15px;stroke:currentColor;fill:none}
+
+/* ─── PASS MODAL ─── */
+.pass-box{background:var(--s1);border:1px solid var(--border);border-radius:18px;width:100%;max-width:340px;padding:26px;transform:translateY(20px);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.overlay.open .pass-box{transform:none}
+.pass-box h3{font-size:17px;font-weight:800;margin-bottom:5px}
+.pass-box p{font-size:12.5px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.inp{width:100%;height:42px;border-radius:10px;border:1.5px solid var(--border);background:var(--s2);color:var(--text);font-family:'Manrope',sans-serif;font-size:14px;padding:0 12px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:rgba(232,245,58,.38)}
+.err-msg{font-size:11px;color:var(--red);margin-top:7px;display:none}
+.err-msg.show{display:block}
+.btn-row{display:flex;gap:8px;margin-top:14px}
+.btn{height:38px;border-radius:9px;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;transition:opacity .15s,transform .1s}
+.btn:hover{opacity:.85}
+.btn:active{transform:scale(.98)}
+.btn-accent{background:var(--accent);color:#0a0c0e;flex:1}
+.btn-ghost{background:var(--s2);color:var(--muted);border:1px solid var(--border)}
+.btn-danger-full{background:rgba(240,58,110,.1);border:1px solid rgba(240,58,110,.25);color:var(--red)}
+
+/* ─── ADMIN VIEW ─── */
+#adminView{display:none;min-height:100vh;position:relative;z-index:1}
+.admin-bar{background:var(--s1);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.admin-logo{display:flex;align-items:center;gap:10px}
+.admin-logo span{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.03em}
+.admin-pill{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:rgba(240,58,110,.1);border:1px solid rgba(240,58,110,.22);color:var(--red)}
+.admin-body{max-width:880px;margin:0 auto;padding:30px 24px 80px}
+.sec{margin-bottom:32px}
+.sec-label{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ─── TOGGLE ─── */
+.toggle-card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.toggle-info h4{font-size:14px;font-weight:700;margin-bottom:4px}
+.toggle-info p{font-size:12.5px;color:var(--muted);max-width:400px;line-height:1.55}
+.sw{position:relative;width:50px;height:26px;flex-shrink:0;cursor:pointer}
+.sw input{position:absolute;opacity:0;width:0;height:0}
+.sw-track{position:absolute;inset:0;border-radius:100px;background:var(--s2);border:1px solid var(--border);transition:all .25s}
+.sw-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--dim);transition:transform .25s,background .25s}
+.sw input:checked~.sw-track{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.35)}
+.sw input:checked~.sw-track .sw-thumb{transform:translateX(24px);background:var(--blue)}
+
+/* ─── ADMIN DAY LIST ─── */
+.adm-day{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;transition:border-color .2s}
+.adm-day:hover{border-color:var(--bh)}
+.adm-day-n{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:var(--dim);min-width:32px}
+.adm-day-info{flex:1}
+.adm-day-title{font-size:13.5px;font-weight:700;margin-bottom:2px}
+.adm-day-meta{font-size:11.5px;color:var(--muted)}
+.btn-edit{height:32px;padding:0 12px;border-radius:8px;font-family:'Manrope',sans-serif;font-size:11.5px;font-weight:700;background:var(--s2);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:border-color .15s,color .15s;display:flex;align-items:center;gap:5px}
+.btn-edit:hover{border-color:var(--bh);color:var(--text)}
+.btn-edit svg{width:11px;height:11px;stroke:currentColor;fill:none}
+.action-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.action-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px}
+.action-card h4{font-size:13px;font-weight:700;margin-bottom:4px}
+.action-card p{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+
+/* ─── EDIT DAY MODAL ─── */
+.edit-modal{background:var(--s1);border:1px solid var(--border);border-radius:22px;width:100%;max-width:660px;max-height:88vh;overflow-y:auto;transform:translateY(20px);transition:transform .35s cubic-bezier(.34,1.56,.64,1);scrollbar-width:thin;scrollbar-color:var(--dim) transparent}
+.edit-modal::-webkit-scrollbar{width:3px}
+.edit-modal::-webkit-scrollbar-thumb{background:var(--dim);border-radius:3px}
+.overlay.open .edit-modal{transform:none}
+.em-head{padding:20px 22px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.em-head h3{font-size:16px;font-weight:800}
+.em-body{padding:20px 22px}
+.fg{margin-bottom:14px}
+.flabel{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:block}
+.finp{width:100%;border-radius:9px;border:1.5px solid var(--border);background:var(--s2);color:var(--text);font-family:'Manrope',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.finp:focus{border-color:rgba(232,245,58,.35)}
+.finp-text{height:38px;padding:0 11px}
+.finp-area{padding:9px 11px;resize:vertical;min-height:64px;line-height:1.55}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px}
+.ttog{padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:1.5px solid var(--border);background:var(--s2);color:var(--muted);transition:all .15s}
+.ttog.a-warm{border-color:rgba(245,133,58,.45);background:rgba(245,133,58,.09);color:var(--orange)}
+.ttog.a-cardio{border-color:rgba(240,58,110,.45);background:rgba(240,58,110,.09);color:var(--red)}
+.ttog.a-strength{border-color:rgba(74,240,168,.45);background:rgba(74,240,168,.09);color:var(--green)}
+.ttog.a-flex{border-color:rgba(167,139,250,.45);background:rgba(167,139,250,.09);color:var(--purple)}
+.ttog.a-rest{border-color:rgba(232,245,58,.45);background:rgba(232,245,58,.09);color:var(--accent)}
+.ttog.a-balance{border-color:rgba(56,189,248,.45);background:rgba(56,189,248,.09);color:var(--blue)}
+.ttog.a-core{border-color:rgba(251,146,60,.45);background:rgba(251,146,60,.09);color:#fb923c}
+.mini-head{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px}
+.adm-ex{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:11px 12px;margin-bottom:8px}
+.adm-ex-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+.adm-ex-full{margin-bottom:7px}
+.adm-ex-bottom{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.label-sm{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.ico-opts{display:flex;gap:4px;flex-wrap:wrap}
+.ico-btn{width:28px;height:28px;border-radius:7px;background:var(--s3);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .12s,background .12s}
+.ico-btn svg{width:14px;height:14px;fill:none;stroke:var(--muted)}
+.ico-btn.sel{border-color:rgba(232,245,58,.4);background:rgba(232,245,58,.07)}
+.ico-btn.sel svg{stroke:var(--accent)}
+.col-opts{display:flex;gap:4px}
+.col-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .12s,transform .1s}
+.col-dot:hover{transform:scale(1.15)}
+.col-dot.sel{border-color:white}
+.btn-del-ex{width:28px;height:28px;min-width:28px;border-radius:7px;background:rgba(240,58,110,.07);border:1px solid rgba(240,58,110,.18);color:var(--red);cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:background .12s}
+.btn-del-ex:hover{background:rgba(240,58,110,.14)}
+.btn-del-ex svg{width:12px;height:12px;stroke:currentColor;fill:none}
+.btn-add-ex{width:100%;height:36px;border-radius:9px;border:1.5px dashed var(--border);background:transparent;color:var(--muted);font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:border-color .15s,color .15s;margin-top:4px}
+.btn-add-ex:hover{border-color:var(--bh);color:var(--text)}
+.btn-add-ex svg{width:13px;height:13px;stroke:currentColor;fill:none}
+.em-foot{padding:14px 22px 20px;display:flex;gap:8px}
+
+/* ─── FOOTER ─── */
+.site-footer{max-width:1100px;margin:0 auto;padding:24px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);position:relative;z-index:1}
+.footer-txt{font-size:12px;color:var(--dim)}
+.admin-link{font-size:11.5px;color:var(--dim);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color .15s;font-family:'Manrope',sans-serif;font-weight:600}
+.admin-link:hover{color:var(--muted)}
+.admin-link svg{width:12px;height:12px;stroke:currentColor;fill:none}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.day-card:nth-child(1){animation-delay:.04s}.day-card:nth-child(2){animation-delay:.08s}.day-card:nth-child(3){animation-delay:.12s}.day-card:nth-child(4){animation-delay:.16s}.day-card:nth-child(5){animation-delay:.20s}.day-card:nth-child(6){animation-delay:.24s}.day-card:nth-child(7){animation-delay:.28s}.day-card:nth-child(8){animation-delay:.32s}.day-card:nth-child(9){animation-delay:.36s}.day-card:nth-child(10){animation-delay:.40s}
+@media(max-width:600px){.days-grid{grid-template-columns:1fr;gap:10px}.hero h1{font-size:68px}.frow{grid-template-columns:1fr}.adm-ex-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════ STUDENT VIEW ══ -->
+<div id="studentView">
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      10 күндік бағдарлама
+    </div>
+    <h1>Дене<em>тәрбиесі</em></h1>
+    <p class="hero-sub">Денені нығайтуға және төзімділікті дамытуға арналған күнделікті тапсырмалар. Күнді таңдаңыз және жаттығуды бастаңыз.</p>
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">Күн</div></div>
+      <div class="stat-item"><div class="stat-num" id="doneCount">0</div><div class="stat-label">Орындалды</div></div>
+      <div class="stat-item"><div class="stat-num" id="pctStat">0%</div><div class="stat-label">Барысы</div></div>
+    </div>
+  </section>
+
+  <div class="top-bar">
+    <div class="mode-chip seq" id="modeChip">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      <span id="modeChipTxt">Тізбекті режим</span>
+    </div>
+    <span class="prog-pct-inline" id="progPctInline">0%</span>
+  </div>
+  <div class="prog-section">
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+
+  <main class="days-grid" id="daysGrid"></main>
+
+  <footer class="site-footer">
+    <span class="footer-txt">Дене тәрбиесі · 10 күн</span>
+    <button class="admin-link" onclick="openPassModal()">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Әкімші панелі
+    </button>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════ DAY MODAL ══ -->
+<div class="overlay" id="dayOverlay" onclick="closeDayModal(event)">
+  <div class="day-modal" id="dayModal">
+    <div class="dm-header">
+      <div class="dm-num" id="dmNum">01</div>
+      <div class="dm-info">
+        <div class="dm-title" id="dmTitle"></div>
+        <div class="dm-meta">
+          <span class="dm-dur" id="dmDur"></span>
+          <div id="dmTags"></div>
+        </div>
+      </div>
+      <button class="close-btn" onclick="closeDayModal(null)">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="dm-body">
+      <div class="dm-note" id="dmNote"></div>
+      <div class="ex-list" id="dmExercises"></div>
+      <button class="done-btn" id="dmDoneBtn" onclick="toggleDone()">
+        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="dmDoneTxt">Орындалды деп белгілеу</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ PASS MODAL ══ -->
+<div class="overlay" id="passOverlay" onclick="closePassModal(event)">
+  <div class="pass-box">
+    <h3>Әкімші панелі</h3>
+    <p>Жалғастыру үшін кіру кодын енгізіңіз.</p>
+    <input type="password" class="inp" id="passInp" placeholder="Кіру коды" onkeydown="if(event.key==='Enter')checkPass()">
+    <div class="err-msg" id="passErr">Қате код. Қайталаңыз.</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="closePassModal(null)">Болдырмау</button>
+      <button class="btn btn-accent" onclick="checkPass()">Кіру</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ ADMIN VIEW ══ -->
+<div id="adminView">
+  <div class="admin-bar">
+    <div class="admin-logo">
+      <span>Дене тәрбиесі</span>
+      <span class="admin-pill">Әкімші</span>
+    </div>
+    <button class="btn btn-ghost" onclick="exitAdmin()" style="height:34px;font-size:12px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Шығу
+    </button>
+  </div>
+  <div class="admin-body">
+
+    <div class="sec">
+      <div class="sec-label">Оқу режимі</div>
+      <div class="toggle-card">
+        <div class="toggle-info">
+          <h4 id="modeCardTitle">Тізбекті режим</h4>
+          <p id="modeCardDesc">Оқушылар күндерді кезекпен ғана орындай алады. Алдыңғы күн аяқталмай, келесісіне өту мүмкін емес.</p>
+        </div>
+        <label class="sw">
+          <input type="checkbox" id="modeToggle" onchange="onModeToggle()">
+          <div class="sw-track"><div class="sw-thumb"></div></div>
+        </label>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Күндерді өңдеу</div>
+      <div id="admDaysList"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Қосымша</div>
+      <div class="action-grid">
+        <div class="action-card">
+          <h4>Прогресті тазалау</h4>
+          <p>Орындалған күндер туралы барлық деректерді жою.</p>
+          <button class="btn btn-danger-full" style="height:34px;font-size:12px;border-radius:8px;width:100%;" onclick="resetProgress()">Тазалау</button>
+        </div>
+        <div class="action-card">
+          <h4>Деректерді қалпына келтіру</h4>
+          <p>Барлық мазмұнды бастапқы күйге қайтару.</p>
+          <button class="btn btn-danger-full" style="height:34px;font-size:12px;border-radius:8px;width:100%;" onclick="resetAllData()">Қалпына келтіру</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ EDIT DAY MODAL ══ -->
+<div class="overlay" id="editOverlay" onclick="closeEditModal(event)">
+  <div class="edit-modal">
+    <div class="em-head">
+      <h3 id="emTitle">Күнді өңдеу</h3>
+      <button class="close-btn" onclick="closeEditModal(null)">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="em-body">
+      <div class="frow">
+        <div class="fg">
+          <label class="flabel">Тақырып</label>
+          <input type="text" class="finp finp-text" id="eTitle">
+        </div>
+        <div class="fg">
+          <label class="flabel">Ұзақтығы</label>
+          <input type="text" class="finp finp-text" id="eDur" placeholder="мыс: 30 мин">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="flabel">Ескерту / Кеңес</label>
+        <textarea class="finp finp-area" id="eNote"></textarea>
+      </div>
+      <div class="fg">
+        <label class="flabel">Тегтер</label>
+        <div class="tag-row" id="eTagsRow"></div>
+      </div>
+      <div class="mini-head">
+        Жаттығулар
+        <button class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;" onclick="addEx()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Қосу
+        </button>
+      </div>
+      <div id="eExList"></div>
+    </div>
+    <div class="em-foot">
+      <button class="btn btn-ghost" onclick="closeEditModal(null)">Болдырмау</button>
+      <button class="btn btn-accent" style="flex:1;" onclick="saveDay()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Сақтау
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ SVG ICONS ══ -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="icon-run" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="1.5"/><path d="M5.5 21L8 15l3 2 4-7"/><path d="M9 11l2-3 5 1 3-4"/><path d="M16 21l-2-5"/></symbol>
+    <symbol id="icon-squat" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.5"/><path d="M12 6v6l-3 4h6l-3-4"/><path d="M9 16l-2 5"/><path d="M15 16l2 5"/></symbol>
+    <symbol id="icon-push" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="1.5"/><path d="M6 7v5l8 2"/><path d="M14 14h4"/><path d="M6 12l-2 7"/></symbol>
+    <symbol id="icon-stretch" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.5"/><path d="M12 6l-4 8h8l-4-8z"/><path d="M8 14l-2 6"/><path d="M16 14l2 6"/><line x1="4" y1="11" x2="20" y2="11"/></symbol>
+    <symbol id="icon-jump" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="3.5" r="1.5"/><path d="M12 5.5v5l-3 2 3 2 3-2-3-2"/><path d="M9 12.5l-3 6"/><path d="M15 12.5l3 6"/></symbol>
+    <symbol id="icon-plank" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="9" r="1.5"/><line x1="4" y1="10.5" x2="18" y2="13"/><line x1="18" y1="13" x2="21" y2="11.5"/><path d="M18 13v4"/></symbol>
+    <symbol id="icon-breath" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a5 5 0 0 1 5 5c0 4-5 10-5 10S7 11 7 7a5 5 0 0 1 5-5z"/><circle cx="12" cy="7" r="2"/></symbol>
+    <symbol id="icon-abs" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.5"/><path d="M12 6v4"/><path d="M9 10h6"/><path d="M9 10l-1 8"/><path d="M15 10l1 8"/><path d="M10 14h4"/></symbol>
+    <symbol id="icon-balance" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.5"/><path d="M12 6v6"/><path d="M12 12l-5 4"/><path d="M12 12l5 4"/><path d="M7 20h10"/><path d="M12 16v4"/></symbol>
+    <symbol id="icon-walk" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.5"/><path d="M9 21l1.5-6L12 17l1.5-2L15 21"/><path d="M12 6l-2 7 2 2 2-2-2-7"/><path d="M8 9h-2"/><path d="M16 9h2"/></symbol>
+    <symbol id="icon-yoga" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.5"/><path d="M12 6v5l-5 3"/><path d="M12 11l5 3"/><path d="M7 9h10"/></symbol>
+    <symbol id="icon-flame" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.66 0 3-1.34 3-3 0-1.5-2-6-2-6s-2 4.5-2 6a2.5 2.5 0 0 0 .5 1.5z"/><path d="M12 22c4.97 0 9-3.58 9-8 0-3-1.5-6-4-8-1 2-2 3-4 4 0-2-1-4-3-5-1 3-3 5-3 9 0 4.42 2.24 8 5 8z"/></symbol>
+    <symbol id="icon-lunge" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="1.5"/><path d="M11 5.5L9 11l4 2"/><path d="M9 11l-3 8"/><path d="M13 13l3 6"/></symbol>
+    <symbol id="icon-dumbbell" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="18" x2="18" y2="6"/><rect x="2" y="14" width="4" height="4" rx="1"/><rect x="18" y="6" width="4" height="4" rx="1"/></symbol>
+    <symbol id="icon-rope" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.5"/><path d="M12 5.5v4"/><path d="M9 10c-4 1-4 5 0 5"/><path d="M15 10c4 1 4 5 0 5"/><path d="M9 15l-2 4"/><path d="M15 15l2 4"/></symbol>
+    <symbol id="icon-cool" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  </defs>
+</svg>
+
+<script>
+// ════════════════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════════════════
+const ADMIN_PASS = 'fizadmin';
+
+const TAG_LABELS = {
+  warm:'Жылыну', cardio:'Кардио', strength:'Күш',
+  flex:'Икемділік', rest:'Қалпына келтіру', balance:'Тепе-теңдік', core:'Іш бұлшықеттері'
+};
+const ALL_TAGS = ['warm','cardio','strength','flex','rest','balance','core'];
+
+const ICONS = ['icon-run','icon-squat','icon-push','icon-stretch','icon-jump','icon-plank',
+               'icon-breath','icon-abs','icon-balance','icon-walk','icon-yoga','icon-flame',
+               'icon-lunge','icon-dumbbell','icon-rope','icon-cool','icon-star'];
+
+const COLORS = {
+  'ico-y':'#e8f53a', 'ico-g':'#4af0a8', 'ico-o':'#f5853a',
+  'ico-p':'#f03a6e', 'ico-v':'#a78bfa', 'ico-b':'#38bdf8'
+};
+
+// ════════════════════════════════════════════════════
+// DEFAULT DATA (Kazakh, balanced 10-day PE)
+// ════════════════════════════════════════════════════
+const DEFAULT_DAYS = [
+  {
+    day:1, title:"Бастау: Жылыну және негізгі қозғалыстар",
+    tags:["warm","flex"], duration:"25 мин",
+    note:"Бірінші күн — бағдарламаға жұмсақ кіріс. Асықпаңыз, тыныс алуыңызды қадағалаңыз.",
+    exercises:[
+      {icon:"icon-walk",  ic:"ico-y", name:"Орнында жүру",           desc:"Тізелерді жоғары көтере белсенді жүру",                params:["3 мин"]},
+      {icon:"icon-stretch",ic:"ico-v",name:"Дене иілімдері",          desc:"Алға, артқа және екі жаққа иілу",                      params:["10 рет","әр жаққа"]},
+      {icon:"icon-cool",  ic:"ico-b", name:"Буын айналымы",           desc:"Тобық, тізе, жамбас, иық, мойын",                     params:["8 рет"]},
+      {icon:"icon-lunge", ic:"ico-o", name:"Орнында табандар",        desc:"Ауыртпалықсыз баяу табандар",                         params:["3 × 10 рет"]},
+      {icon:"icon-breath",ic:"ico-g", name:"Диафрагмалық тыныс",     desc:"Терең дем алу — іш, ұстап тұру, аузыңызбен шығару",   params:["5 цикл"]},
+    ]
+  },
+  {
+    day:2, title:"Кардио: Қан айналымын жеделдету",
+    tags:["cardio","warm"], duration:"30 мин",
+    note:"Пульсті аэробты аймақта ұстаңыз — қысқа сөйлемдермен сөйлей алуыңыз керек.",
+    exercises:[
+      {icon:"icon-run",   ic:"ico-o", name:"Орнында жүгіру",          desc:"Тізелерді жоғары көтере орташа қарқынмен",             params:["3 × 1 мин","демалыс 30 с"]},
+      {icon:"icon-jump",  ic:"ico-p", name:"«Жұлдыз» секіруі",        desc:"Джампинг-джек — аяқтар мен қолдар бір уақытта",        params:["3 × 15 рет"]},
+      {icon:"icon-rope",  ic:"ico-y", name:"Арқаннан секіру",          desc:"Немесе арқансыз имитация",                             params:["2 × 45 с"]},
+      {icon:"icon-run",   ic:"ico-o", name:"Бүйірлік аттап өту",      desc:"Кең тұрыппен бүйірге аттап өту",                      params:["2 × 20 рет"]},
+      {icon:"icon-breath",ic:"ico-g", name:"Тоқтату — баяу жүру",     desc:"Тынысты қалыпқа келтіре баяу жүру",                   params:["3 мин"]},
+    ]
+  },
+  {
+    day:3, title:"Күш: Төменгі дене",
+    tags:["strength"], duration:"35 мин",
+    note:"Тізелеріңізді бақылаңыз — олар саусақтардан шықпауы керек. Арқа тік болсын.",
+    exercises:[
+      {icon:"icon-squat", ic:"ico-o", name:"Шалқасынан отыру",        desc:"Классикалық, аяқтар иықтай",                           params:["4 × 15 рет","демалыс 60 с"]},
+      {icon:"icon-lunge", ic:"ico-y", name:"Алға табандар",            desc:"Кезек-кезек әр аяқпен",                               params:["3 × 12 рет"]},
+      {icon:"icon-squat", ic:"ico-o", name:"Кең отыру",               desc:"Кең тұрып, саусақтар сыртқа қараған",                 params:["3 × 15 рет"]},
+      {icon:"icon-balance",ic:"ico-b",name:"Жамбас көтеру",           desc:"Арқаңызбен жатып, жамбасты жоғары көтеру",             params:["3 × 20 рет"]},
+      {icon:"icon-stretch",ic:"ico-v",name:"Санның алдыңғы бұлшықетін созу",desc:"Тұрып, өкшені сансыңа жақындату",              params:["30 с","әр аяқ"]},
+    ]
+  },
+  {
+    day:4, title:"Жоғарғы дене: Кеуде және иықтар",
+    tags:["strength","flex"], duration:"30 мин",
+    note:"Итерілуде дене бастан табанға дейін тік сызық болуы керек. Беліңіз салпымасын.",
+    exercises:[
+      {icon:"icon-push",  ic:"ico-o", name:"Классикалық итерілу",      desc:"Алақандар иықтың астында, шынтақтар 45°",              params:["4 × 10 рет"]},
+      {icon:"icon-push",  ic:"ico-p", name:"Кең итерілу",              desc:"Алақандар иықтан кең — кеудеге акцент",                params:["3 × 10 рет"]},
+      {icon:"icon-dumbbell",ic:"ico-y",name:"Тұрып қолды жаю",        desc:"Гантелмен немесе су шишасымен",                        params:["3 × 15 рет"]},
+      {icon:"icon-cool",  ic:"ico-b", name:"Иық айналымы",             desc:"Артқа және алға, бос қолдар",                         params:["10 рет","әр жаққа"]},
+      {icon:"icon-stretch",ic:"ico-v",name:"Кеудені созу",             desc:"Қолдар артқа, кеуде клеткасын ашу",                   params:["30 с × 3"]},
+    ]
+  },
+  {
+    day:5, title:"Іш бұлшықеттері және тұрақтандыру",
+    tags:["core","strength"], duration:"30 мин",
+    note:"Әр жаттығуда ішіңізді тартыңыз. Тыныс алыңыз — ұстамаңыз.",
+    exercises:[
+      {icon:"icon-abs",   ic:"ico-o", name:"Бүгілу (Crunch)",          desc:"Бел еденге жабысқан, мойын бос",                      params:["4 × 20 рет"]},
+      {icon:"icon-plank", ic:"ico-g", name:"Шынтақта тақтай",          desc:"Тік дене, төмен қарай",                               params:["3 × 30 с"]},
+      {icon:"icon-abs",   ic:"ico-y", name:"Қайшы",                    desc:"Жатып, кезек-кезек тік аяқты көтеру",                 params:["3 × 20 рет"]},
+      {icon:"icon-plank", ic:"ico-b", name:"Бүйірлік тақтай",          desc:"Бір шынтақта, дене тік",                              params:["2 × 20 с","әр жаққа"]},
+      {icon:"icon-yoga",  ic:"ico-v", name:"«Мысық-сиыр» қалпы",      desc:"Төрт аяқта: иілу және доғалану",                     params:["10 цикл"]},
+    ]
+  },
+  {
+    day:6, title:"Белсенді қалпына келтіру және икемділік",
+    tags:["flex","rest"], duration:"25 мин",
+    note:"Бүгін жұмсақ күн. Созылуды мәжбүрлемеңіз — әр қалыпта тыныс алыңыз.",
+    exercises:[
+      {icon:"icon-yoga",  ic:"ico-v", name:"«Бала» қалпы",            desc:"Өкшеде отырып, қолдар алға, маңдай еденге",           params:["3 × 40 с"]},
+      {icon:"icon-stretch",ic:"ico-v",name:"Отырып аяқты созу",       desc:"Аяқтар бірге, табандарға қарай созылу",               params:["3 × 30 с"]},
+      {icon:"icon-yoga",  ic:"ico-b", name:"«Көгершін» қалпы",        desc:"Жамбас буынын тереңірек ашу",                         params:["40 с","әр аяқ"]},
+      {icon:"icon-cool",  ic:"ico-g", name:"Жатып бұралу",            desc:"Арқамен жатып, тізелер жаққа",                        params:["30 с","әр жаққа"]},
+      {icon:"icon-breath",ic:"ico-y", name:"Шавасана + тыныс алу",    desc:"Толық босаңсу, 4-7-8 тыныс алу",                     params:["5 мин"]},
+    ]
+  },
+  {
+    day:7, title:"Интервалдар: Жоғары қарқындылық",
+    tags:["cardio","strength"], duration:"35 мин",
+    note:"Әр жаттығуды максималды қарқынмен орындаңыз. Демалыс — қатаң уақыт бойынша.",
+    exercises:[
+      {icon:"icon-flame", ic:"ico-p", name:"Бёрпи",                   desc:"Толық бёрпи: отыру — тақтай — жоғары секіру",         params:["3 × 10 рет"]},
+      {icon:"icon-jump",  ic:"ico-o", name:"Секіруімен шалқасынан отыру",desc:"Отырып, максималды биіктікке секіру",             params:["3 × 12 рет"]},
+      {icon:"icon-run",   ic:"ico-p", name:"Тау альпинисі",            desc:"Тақтайда — тізелерді кезек-кезек кеудеге тарту",     params:["3 × 30 с"]},
+      {icon:"icon-push",  ic:"ico-o", name:"Жарылмалы итерілу",        desc:"Жылдам жоғары, алақандар еденнен",                   params:["3 × 8 рет"]},
+      {icon:"icon-breath",ic:"ico-g", name:"Белсенді тоқтату",         desc:"Жүру, терең тыныс алу, санды созу",                  params:["4 мин"]},
+    ]
+  },
+  {
+    day:8, title:"Тепе-теңдік және үйлесімділік",
+    tags:["balance","flex"], duration:"30 мин",
+    note:"Алдыңғы белгіленген нүктеге қараңыз — бұл тепе-теңдікті сақтауға көмектеседі.",
+    exercises:[
+      {icon:"icon-balance",ic:"ico-b",name:"Бір аяқта тұру",          desc:"Тізені көтеру, қолдар екі жаққа",                     params:["3 × 30 с","әр аяқ"]},
+      {icon:"icon-lunge", ic:"ico-y", name:"Кейін-бүйір табандар",    desc:"Артқа және бүйірге табан",                            params:["3 × 10 рет"]},
+      {icon:"icon-balance",ic:"ico-g",name:"«III Жауынгер» қалпы",   desc:"Дене еденмен параллель, аяқ созылған",                params:["20 с","әр аяқ"]},
+      {icon:"icon-yoga",  ic:"ico-v", name:"«Ағаш» қалпы",           desc:"Табан санда немесе балтырда, қолдар жоғары",          params:["30 с","әр аяқ"]},
+      {icon:"icon-stretch",ic:"ico-v",name:"Тұрып бүйірге иілу",     desc:"Қол дене бойымен төмен тартылады",                   params:["10 рет","әр жаққа"]},
+    ]
+  },
+  {
+    day:9, title:"Барлық дене: Соңғы жүктеме",
+    tags:["strength","cardio","core"], duration:"40 мин",
+    note:"Соңғыдан алдыңғы күн — максималды береңіз! Ертең жеңіл қалпына келтіру.",
+    exercises:[
+      {icon:"icon-squat", ic:"ico-o", name:"Секіруімен отыру",         desc:"Кәдімгі отыру — жарылмалы жоғары секіру",             params:["4 × 12 рет"]},
+      {icon:"icon-push",  ic:"ico-p", name:"Итерілу + бұрылу",         desc:"Итерілгеннен кейін бүйірлік тақтайға бұрылу",         params:["3 × 8 рет"]},
+      {icon:"icon-plank", ic:"ico-g", name:"Тақтай + қол көтеру",      desc:"Тақтай ұстап, кезек-кезек қол көтеру",               params:["3 × 10 рет"]},
+      {icon:"icon-abs",   ic:"ico-y", name:"Велосипед",                desc:"Жатып, шынтақ қарсы тізеге",                         params:["3 × 20 рет"]},
+      {icon:"icon-run",   ic:"ico-o", name:"Интервалды жүгіру",        desc:"Орнында жүгіру 30 с — жүру 30 с",                    params:["5 цикл"]},
+      {icon:"icon-stretch",ic:"ico-v",name:"Тоқтату: созылу",         desc:"Барлық бұлшықет топтарының толық созылуы",            params:["5 мин"]},
+    ]
+  },
+  {
+    day:10, title:"Аяқтау: Қорытынды сессия",
+    tags:["flex","rest","balance"], duration:"30 мин",
+    note:"Соңғы күнмен құттықтаймыз! Бәрін ризашылықпен орындаңыз — бағдарламаны аяқтадыңыз.",
+    exercises:[
+      {icon:"icon-walk",  ic:"ico-y", name:"Баяу серуен жылыну",       desc:"10 минут тыныш жүру",                                params:["10 мин"]},
+      {icon:"icon-yoga",  ic:"ico-v", name:"«Күнге сәлем» кешені",     desc:"Асанаардың жұмсақ тізбегі",                          params:["3 рет"]},
+      {icon:"icon-breath",ic:"ico-g", name:"Тыныс алу жаттығуы",       desc:"Қорап тынысы: 4 дем — 4 ұстау — 4 шығару — 4 ұстау", params:["5 мин"]},
+      {icon:"icon-star",  ic:"ico-b", name:"Еркін қозғалыс",           desc:"Ең ұнаған кез келген жаттығулар",                    params:["5 мин"]},
+      {icon:"icon-cool",  ic:"ico-v", name:"Шавасана",                 desc:"Толық босаңсу, жетістікті сезіну",                   params:["5 мин"]},
+    ]
+  },
+];
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let days    = JSON.parse(localStorage.getItem('pe_days') || 'null') || deepClone(DEFAULT_DAYS);
+let done    = new Set(JSON.parse(localStorage.getItem('pe_done') || '[]'));
+let freeMode= localStorage.getItem('pe_mode') === 'free';
+let activeDayIdx = -1;
+let editIdx = -1;
+let editExs = [];
+
+function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
+function save(){
+  localStorage.setItem('pe_days', JSON.stringify(days));
+  localStorage.setItem('pe_done', JSON.stringify([...done]));
+  localStorage.setItem('pe_mode', freeMode ? 'free' : 'sequential');
+}
+
+// ════════════════════════════════════════════════════
+// STUDENT VIEW
+// ════════════════════════════════════════════════════
+function isLocked(i){ return !freeMode && i > 0 && !done.has(days[i-1].day); }
+
+function renderStudent(){
+  // mode chip
+  const chip = document.getElementById('modeChip');
+  const chipTxt = document.getElementById('modeChipTxt');
+  if(freeMode){
+    chip.className = 'mode-chip free';
+    chipTxt.textContent = 'Еркін режим';
+  } else {
+    chip.className = 'mode-chip seq';
+    chipTxt.textContent = 'Тізбекті режим';
+  }
+  // grid
+  document.getElementById('daysGrid').innerHTML = days.map((d,i)=>{
+    const locked = isLocked(i);
+    const isDone = done.has(d.day);
+    const tags = d.tags.map(t=>`<span class="tag tag-${t}">${TAG_LABELS[t]||t}</span>`).join('');
+    return `<article class="day-card${isDone?' done':''}${locked?' locked':''}" onclick="openDay(${i})">
+      <div class="card-inner">
+        <div class="day-num">${String(d.day).padStart(2,'0')}</div>
+        <div class="card-meta">
+          <div class="card-title">${d.title}</div>
+          <div class="card-tags">${tags}</div>
+          <div class="card-ex-count">${d.exercises.length} жаттығу</div>
+        </div>
+        <div class="card-right">
+          <div class="done-badge"><svg><use href="#icon-check"/></svg></div>
+          <div class="lock-badge"><svg><use href="#icon-lock"/></svg></div>
+          <div class="dur-badge">${d.duration}</div>
+          <div class="arrow-btn"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+      </div>
+    </article>`;
+  }).join('');
+  updateProg();
+}
+
+function updateProg(){
+  const n = done.size;
+  const pct = Math.round(n/days.length*100);
+  document.getElementById('doneCount').textContent = n;
+  document.getElementById('pctStat').textContent = pct+'%';
+  document.getElementById('progPctInline').textContent = pct+'%';
+  document.getElementById('progFill').style.width = pct+'%';
+}
+
+// ════════════════════════════════════════════════════
+// DAY MODAL
+// ════════════════════════════════════════════════════
+function openDay(i){
+  if(isLocked(i)) return;
+  activeDayIdx = i;
+  const d = days[i];
+  const isDone = done.has(d.day);
+  document.getElementById('dmNum').textContent = String(d.day).padStart(2,'0');
+  document.getElementById('dmTitle').textContent = d.title;
+  document.getElementById('dmDur').textContent = d.duration;
+  document.getElementById('dmTags').innerHTML = d.tags.map(t=>`<span class="tag tag-${t}">${TAG_LABELS[t]||t}</span>`).join('');
+  document.getElementById('dmNote').innerHTML =
+    `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>${d.note}</span>`;
+  document.getElementById('dmExercises').innerHTML = d.exercises.map(ex=>`
+    <div class="ex-item">
+      <div class="ex-ico ${ex.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#${ex.icon}"/></svg></div>
+      <div class="ex-cnt">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-desc">${ex.desc}</div>
+        <div class="ex-params">${ex.params.map(p=>`<span class="ex-p">${p}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+  const btn = document.getElementById('dmDoneBtn');
+  const txt = document.getElementById('dmDoneTxt');
+  if(isDone){ btn.classList.add('is-done'); txt.textContent='Орындалды ✓'; }
+  else { btn.classList.remove('is-done'); txt.textContent='Орындалды деп белгілеу'; }
+  document.getElementById('dayOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeDayModal(e){
+  if(e && e.target !== document.getElementById('dayOverlay')) return;
+  document.getElementById('dayOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function toggleDone(){
+  const d = days[activeDayIdx];
+  const isDone = done.has(d.day);
+  const btn = document.getElementById('dmDoneBtn');
+  const txt = document.getElementById('dmDoneTxt');
+  if(isDone){ done.delete(d.day); btn.classList.remove('is-done'); txt.textContent='Орындалды деп белгілеу'; }
+  else { done.add(d.day); btn.classList.add('is-done'); txt.textContent='Орындалды ✓'; }
+  save(); renderStudent();
+}
+
+// ════════════════════════════════════════════════════
+// ADMIN AUTH
+// ════════════════════════════════════════════════════
+function openPassModal(){
+  document.getElementById('passInp').value='';
+  document.getElementById('passErr').classList.remove('show');
+  document.getElementById('passOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('passInp').focus(),100);
+}
+function closePassModal(e){
+  if(e && e.target!==document.getElementById('passOverlay')) return;
+  document.getElementById('passOverlay').classList.remove('open');
+}
+function checkPass(){
+  if(document.getElementById('passInp').value === ADMIN_PASS){
+    document.getElementById('passOverlay').classList.remove('open');
+    enterAdmin();
+  } else {
+    document.getElementById('passErr').classList.add('show');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// ADMIN PANEL
+// ════════════════════════════════════════════════════
+function enterAdmin(){
+  document.getElementById('studentView').style.display='none';
+  document.getElementById('adminView').style.display='block';
+  renderAdmin();
+}
+function exitAdmin(){
+  document.getElementById('adminView').style.display='none';
+  document.getElementById('studentView').style.display='';
+  renderStudent();
+}
+
+function renderAdmin(){
+  document.getElementById('modeToggle').checked = freeMode;
+  updateModeCard();
+  document.getElementById('admDaysList').innerHTML = days.map((d,i)=>`
+    <div class="adm-day">
+      <div class="adm-day-n">${String(d.day).padStart(2,'0')}</div>
+      <div class="adm-day-info">
+        <div class="adm-day-title">${d.title}</div>
+        <div class="adm-day-meta">${d.duration} &middot; ${d.exercises.length} жаттығу &middot; ${d.tags.map(t=>TAG_LABELS[t]||t).join(', ')}</div>
+      </div>
+      <button class="btn-edit" onclick="openEditDay(${i})">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Өңдеу
+      </button>
+    </div>`).join('');
+}
+
+function onModeToggle(){
+  freeMode = document.getElementById('modeToggle').checked;
+  updateModeCard(); save();
+}
+function updateModeCard(){
+  const t = document.getElementById('modeCardTitle');
+  const d = document.getElementById('modeCardDesc');
+  if(freeMode){
+    t.textContent='Еркін режим';
+    d.textContent='Оқушылар кез келген күнді кез келген ретпен орындай алады. Барлық күндер ашық.';
+  } else {
+    t.textContent='Тізбекті режим';
+    d.textContent='Оқушылар күндерді кезекпен ғана орындай алады. Алдыңғы күн аяқталмай, келесісіне өту мүмкін емес.';
+  }
+}
+
+function resetProgress(){
+  if(!confirm('Барлық прогресті тазалауды растайсыз ба?')) return;
+  done.clear(); save(); alert('Прогресс тазаланды.');
+}
+function resetAllData(){
+  if(!confirm('Барлық деректерді бастапқы күйге қайтаруды растайсыз ба?')) return;
+  days = deepClone(DEFAULT_DAYS); done.clear(); save(); renderAdmin(); alert('Деректер қалпына келтірілді.');
+}
+
+// ════════════════════════════════════════════════════
+// EDIT DAY MODAL
+// ════════════════════════════════════════════════════
+function openEditDay(i){
+  editIdx = i;
+  editExs = deepClone(days[i].exercises);
+  const d = days[i];
+  document.getElementById('emTitle').textContent = d.day+'-күнді өңдеу';
+  document.getElementById('eTitle').value = d.title;
+  document.getElementById('eDur').value = d.duration;
+  document.getElementById('eNote').value = d.note;
+  // tags
+  document.getElementById('eTagsRow').innerHTML = ALL_TAGS.map(t=>{
+    const active = d.tags.includes(t) ? ` a-${t}` : '';
+    return `<button class="ttog${active}" data-tag="${t}" onclick="toggleTagBtn(this,'${t}')">${TAG_LABELS[t]}</button>`;
+  }).join('');
+  renderEditExs();
+  document.getElementById('editOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function toggleTagBtn(btn, tag){
+  const cls = `a-${tag}`;
+  btn.classList.toggle(cls);
+}
+
+function renderEditExs(){
+  document.getElementById('eExList').innerHTML = editExs.map((ex,i)=>{
+    const icoBtns = ICONS.map(ic=>
+      `<div class="ico-btn${ex.icon===ic?' sel':''}" onclick="setExIcon(${i},'${ic}',this)" title="${ic}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><use href="#${ic}"/></svg>
+      </div>`).join('');
+    const colBtns = Object.entries(COLORS).map(([c,hex])=>
+      `<div class="col-dot${ex.ic===c?' sel':''}" style="background:${hex}" onclick="setExColor(${i},'${c}',this)" title="${c}"></div>`).join('');
+    return `<div class="adm-ex">
+      <div class="adm-ex-row">
+        <input class="finp finp-text" style="height:34px;font-size:12.5px;" placeholder="Атауы" value="${ex.name}" oninput="editExs[${i}].name=this.value">
+        <input class="finp finp-text" style="height:34px;font-size:12.5px;" placeholder="Параметрлер (үтірмен)" value="${ex.params.join(', ')}" oninput="editExs[${i}].params=this.value.split(',').map(s=>s.trim()).filter(Boolean)">
+      </div>
+      <div class="adm-ex-full"><input class="finp finp-text" style="height:34px;font-size:12.5px;" placeholder="Сипаттамасы" value="${ex.desc}" oninput="editExs[${i}].desc=this.value"></div>
+      <div class="adm-ex-bottom">
+        <span class="label-sm">Белгіше:</span>
+        <div class="ico-opts">${icoBtns}</div>
+        <span class="label-sm" style="margin-left:4px;">Түс:</span>
+        <div class="col-opts">${colBtns}</div>
+        <button class="btn-del-ex" onclick="removeEx(${i})"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('eExList').insertAdjacentHTML('beforeend',
+    `<button class="btn-add-ex" onclick="addEx()"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Жаттығу қосу</button>`);
+}
+
+// These don't re-render — just toggle classes in place
+window.setExIcon = function(i, icon, el){
+  editExs[i].icon = icon;
+  el.closest('.ico-opts').querySelectorAll('.ico-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+};
+window.setExColor = function(i, color, el){
+  editExs[i].ic = color;
+  el.closest('.col-opts').querySelectorAll('.col-dot').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+};
+
+function addEx(){
+  editExs.push({icon:'icon-run',ic:'ico-y',name:'',desc:'',params:[]});
+  renderEditExs();
+}
+function removeEx(i){ editExs.splice(i,1); renderEditExs(); }
+
+function saveDay(){
+  const d = days[editIdx];
+  const t = document.getElementById('eTitle').value.trim();
+  const dur = document.getElementById('eDur').value.trim();
+  const note = document.getElementById('eNote').value.trim();
+  if(t) d.title=t;
+  if(dur) d.duration=dur;
+  if(note) d.note=note;
+  const activeTags = [...document.getElementById('eTagsRow').querySelectorAll('.ttog')]
+    .filter(b=>b.className.match(/a-\w/)).map(b=>b.dataset.tag);
+  if(activeTags.length) d.tags=activeTags;
+  d.exercises = editExs.filter(e=>e.name.trim());
+  save(); renderAdmin(); closeEditModal(null);
+}
+
+function closeEditModal(e){
+  if(e && e.target!==document.getElementById('editOverlay')) return;
+  document.getElementById('editOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+renderStudent();
+</script>
+</body>
+</html>
