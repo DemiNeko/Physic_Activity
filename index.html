@@ -119,6 +119,8 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .dm-body{padding:18px 22px 22px}
 .dm-note{background:rgba(232,245,58,.04);border:1px solid rgba(232,245,58,.13);border-radius:11px;padding:11px 14px;font-size:12.5px;color:var(--muted);line-height:1.65;margin-bottom:16px;display:flex;gap:9px;align-items:flex-start}
 .dm-note svg{width:14px;height:14px;stroke:var(--accent);fill:none;flex-shrink:0;margin-top:2px}
+.dm-video{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000;margin-bottom:16px;border:1px solid var(--border)}
+.dm-video iframe{width:100%;height:100%;border:none;display:block}
 .ex-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
 .ex-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--s2);border-radius:12px;border:1px solid var(--border);transition:border-color .15s}
 .ex-item:hover{border-color:var(--bh)}
@@ -240,6 +242,14 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .btn-add-ex:hover{border-color:var(--bh);color:var(--text)}
 .btn-add-ex svg{width:13px;height:13px;stroke:currentColor;fill:none}
 .em-foot{padding:14px 22px 20px;display:flex;gap:8px}
+.vid-inp-row{display:flex;gap:7px;align-items:center}
+.vid-inp-row .finp{flex:1}
+.btn-vid-clear{height:38px;min-width:38px;border-radius:9px;background:var(--s2);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,color .15s}
+.btn-vid-clear:hover{border-color:var(--bh);color:var(--text)}
+.btn-vid-clear svg{width:14px;height:14px;stroke:currentColor;fill:none}
+.vid-preview{width:100%;aspect-ratio:16/9;border-radius:9px;overflow:hidden;background:var(--s3);border:1px solid var(--border);margin-top:8px;display:flex;align-items:center;justify-content:center}
+.vid-preview iframe{width:100%;height:100%;border:none;display:block}
+.vid-preview-empty{font-size:11.5px;color:var(--dim);text-align:center;padding:12px}
 
 /* ─── FOOTER ─── */
 .site-footer{max-width:1100px;margin:0 auto;padding:24px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);position:relative;z-index:1}
@@ -312,6 +322,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
     </div>
     <div class="dm-body">
       <div class="dm-note" id="dmNote"></div>
+      <div class="dm-video" id="dmVideo" style="display:none"></div>
       <div class="ex-list" id="dmExercises"></div>
       <button class="done-btn" id="dmDoneBtn" onclick="toggleDone()">
         <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -412,6 +423,16 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
         <textarea class="finp finp-area" id="eNote"></textarea>
       </div>
       <div class="fg">
+        <label class="flabel">YouTube видео (ID немесе сілтеме)</label>
+        <div class="vid-inp-row">
+          <input type="text" class="finp finp-text" id="eVideo" placeholder="мыс: dZgVxmf6jkA немесе youtube.com/watch?v=..." oninput="previewVideo()">
+          <button class="btn-vid-clear" onclick="clearVideo()" title="Өшіру">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="vid-preview" id="eVideoPreview"><span class="vid-preview-empty">Алдын ала қарау үшін ID немесе YouTube сілтемесін енгізіңіз</span></div>
+      </div>
+      <div class="fg">
         <label class="flabel">Тегтер</label>
         <div class="tag-row" id="eTagsRow"></div>
       </div>
@@ -479,6 +500,21 @@ const COLORS = {
   'ico-y':'#e8f53a', 'ico-g':'#4af0a8', 'ico-o':'#f5853a',
   'ico-p':'#f03a6e', 'ico-v':'#a78bfa', 'ico-b':'#38bdf8'
 };
+
+// One key YouTube video per day (shown above exercises in the modal)
+const DEFAULT_VIDEOS = {
+  1: 'TFSYNWPYujQ',  // Full body warmup & mobility
+  2: 'iSSAk4XCsRA',  // Jumping jacks cardio
+  3: 'aclHkVaku9U',  // How to squat correctly
+  4: 'IODxDxX7oi4',  // Push-up technique
+  5: 'Xyd_fa5zoEU',  // Crunch & core basics
+  6: 'qYvYsFrTI0U',  // Child's pose recovery
+  7: 'dZgVxmf6jkA',  // Burpees full tutorial
+  8: 'wdln9qWYloU',  // Balance & tree pose
+  9: 'uoIIxLyVleY',  // Jump squats full body
+  10:'LKmdCyH69Qk',  // Sun salutation flow
+};
+let dayVideos = JSON.parse(localStorage.getItem('pe_videos') || 'null') || Object.assign({}, DEFAULT_VIDEOS);
 
 // ════════════════════════════════════════════════════
 // DEFAULT DATA (Kazakh, balanced 10-day PE)
@@ -622,6 +658,7 @@ function save(){
   localStorage.setItem('pe_days', JSON.stringify(days));
   localStorage.setItem('pe_done', JSON.stringify([...done]));
   localStorage.setItem('pe_mode', freeMode ? 'free' : 'sequential');
+  localStorage.setItem('pe_videos', JSON.stringify(dayVideos));
 }
 
 // ════════════════════════════════════════════════════
@@ -688,6 +725,15 @@ function openDay(i){
   document.getElementById('dmTags').innerHTML = d.tags.map(t=>`<span class="tag tag-${t}">${TAG_LABELS[t]||t}</span>`).join('');
   document.getElementById('dmNote').innerHTML =
     `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>${d.note}</span>`;
+  const vidEl = document.getElementById('dmVideo');
+  const vidId = dayVideos[d.day];
+  if(vidId){
+    vidEl.style.display = 'block';
+    vidEl.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}?rel=0&modestbranding=1&iv_load_policy=3" title="${d.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+  } else {
+    vidEl.style.display = 'none';
+    vidEl.innerHTML = '';
+  }
   document.getElementById('dmExercises').innerHTML = d.exercises.map(ex=>`
     <div class="ex-item">
       <div class="ex-ico ${ex.ic}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#${ex.icon}"/></svg></div>
@@ -708,6 +754,7 @@ function openDay(i){
 function closeDayModal(e){
   if(e && e.target !== document.getElementById('dayOverlay')) return;
   document.getElementById('dayOverlay').classList.remove('open');
+  document.getElementById('dmVideo').innerHTML = '';
   document.body.style.overflow='';
 }
 
@@ -796,7 +843,9 @@ function resetProgress(){
 }
 function resetAllData(){
   if(!confirm('Барлық деректерді бастапқы күйге қайтаруды растайсыз ба?')) return;
-  days = deepClone(DEFAULT_DAYS); done.clear(); save(); renderAdmin(); alert('Деректер қалпына келтірілді.');
+  days = deepClone(DEFAULT_DAYS); done.clear();
+  dayVideos = Object.assign({}, DEFAULT_VIDEOS);
+  save(); renderAdmin(); alert('Деректер қалпына келтірілді.');
 }
 
 // ════════════════════════════════════════════════════
@@ -810,6 +859,8 @@ function openEditDay(i){
   document.getElementById('eTitle').value = d.title;
   document.getElementById('eDur').value = d.duration;
   document.getElementById('eNote').value = d.note;
+  document.getElementById('eVideo').value = dayVideos[d.day] || '';
+  previewVideo();
   // tags
   document.getElementById('eTagsRow').innerHTML = ALL_TAGS.map(t=>{
     const active = d.tags.includes(t) ? ` a-${t}` : '';
@@ -878,6 +929,8 @@ function saveDay(){
   if(t) d.title=t;
   if(dur) d.duration=dur;
   if(note) d.note=note;
+  const vid = extractYTId(document.getElementById('eVideo').value);
+  dayVideos[d.day] = vid || null;
   const activeTags = [...document.getElementById('eTagsRow').querySelectorAll('.ttog')]
     .filter(b=>b.className.match(/a-\w/)).map(b=>b.dataset.tag);
   if(activeTags.length) d.tags=activeTags;
@@ -889,6 +942,29 @@ function closeEditModal(e){
   if(e && e.target!==document.getElementById('editOverlay')) return;
   document.getElementById('editOverlay').classList.remove('open');
   document.body.style.overflow='';
+}
+
+// ════════════════════════════════════════════════════
+// VIDEO HELPERS
+// ════════════════════════════════════════════════════
+function extractYTId(str){
+  str = (str || '').trim();
+  if(/^[a-zA-Z0-9_-]{11}$/.test(str)) return str;
+  const m = str.match(/(?:[?&]v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+function previewVideo(){
+  const id = extractYTId(document.getElementById('eVideo').value);
+  const el = document.getElementById('eVideoPreview');
+  if(id){
+    el.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>`;
+  } else {
+    el.innerHTML = `<span class="vid-preview-empty">Алдын ала қарау үшін ID немесе YouTube сілтемесін енгізіңіз</span>`;
+  }
+}
+function clearVideo(){
+  document.getElementById('eVideo').value = '';
+  previewVideo();
 }
 
 // ════════════════════════════════════════════════════
